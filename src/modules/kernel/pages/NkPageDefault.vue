@@ -23,7 +23,7 @@
                 >
                     {{item.name}}
                 </a-button>
-                <a-dropdown >
+                <a-dropdown v-if="screenWidth>768">
                     <a-menu slot="overlay" @click="menuClick">
                         <a-menu-item key="2"> <a-icon type="plus" />添加卡片 </a-menu-item>
                         <a-menu-divider />
@@ -37,6 +37,7 @@
 
         <a-spin :active="true" :spinning="loading" ref="dashboard">
             <grid-layout
+                v-if="screenWidth>768"
                 :layout.sync="layoutFilter"
                 :col-num="24"
                 :row-height="30"
@@ -64,6 +65,7 @@
                                :title="item.title"
                                :value="item.config"
                                :editable="editable"
+                               :enableSetting="!item.disableEdit"
                                ref="items"
                                @remove="removeCard(item)"
                                @update:config="cardConfigUpdated(item,$event)"
@@ -73,6 +75,20 @@
                     </a-card>
                 </grid-item>
             </grid-layout>
+            <div v-else>
+                <div v-for="(item) in layoutFilter" :key="item.i" class="simple-item" :style="{height:(item.h*30)+'px'}">
+                    <component v-if="item.component"
+                               :is="item.componentLost?'nk-dashboard-lost':item.component"
+                               :title="item.title"
+                               :value="item.config"
+                               :editable="false"
+                               ref="items"
+                    ></component>
+                    <a-card v-else :title="item.title" size="small" style="height:100%;" ref="items">
+                        {{ item.i }}{{item.component}}
+                    </a-card>
+                </div>
+            </div>
         </a-spin>
 
 
@@ -142,7 +158,8 @@ export default {
             modalAvailableCards:{
                 visible:false,
                 cards:[]
-            }
+            },
+            screenWidth: document.body.clientWidth
         }
     },
     created(){
@@ -167,6 +184,7 @@ export default {
         let self = this;
         let timeout = undefined;
         this.resizeEvent = ()=>{
+            this.screenWidth = document.body.clientWidth;
             if(timeout) clearTimeout(timeout);
             timeout = setTimeout(self.resizeAll,100);
         };
@@ -177,6 +195,9 @@ export default {
     },
     methods:{
         nk$show(){
+            if(this.reload){
+                this.load(this.data.activeDashboard.id)
+            }
             window.dispatchEvent(new Event('resize'));
         },
         load(id){
@@ -193,17 +214,11 @@ export default {
                         this.layout=[];
                         this.addCard(8,5,"nk-dashboard-hello","欢迎使用");
                     }
+                    console.log(this.layout)
                     this.editable = this.data.activeDashboard.accountId === this.user.id;
                     this.loading = false;
+                    this.reload = false;
                 });
-        },
-        save(){
-            if(this.data.activeDashboard){
-                this.layoutJsonStringify = JSON.stringify(this.layout);
-                this.data.activeDashboard.config = this.layoutJsonStringify;
-                this.$http.postJSON("/api/dashboard/update",this.data.activeDashboard)
-                    .then(()=>{})
-            }
         },
         menuClick(e){
             if(e.key==="1"){
@@ -228,6 +243,28 @@ export default {
                 //this.addCard(8,5,"nk-dashboard-bar1","客户统计123");
             }
         },
+        nk$message(e){
+            if(e.type==='addCard'){
+                const config = e.config;
+
+                let x = 0;
+                let y = Math.max(Math.max.apply(null,this.layout.map(i=>i.y+i.h))+1,0);
+
+                const layout = new Array(...this.layout)
+                layout.push({
+                    "i":uuidv4(),
+                    x,
+                    y,
+                    w:config.w,
+                    h:config.h,
+                    component:config.component,
+                    title:config.title,
+                    config
+                });
+                this.save(layout);
+                this.reload = true;
+            }
+        },
         addCard(w,h,component,title,config){
             let x = 0;
             let y = Math.max(Math.max.apply(null,this.layout.map(i=>i.y+i.h))+1,0);
@@ -240,7 +277,8 @@ export default {
                 h,
                 component,
                 title,
-                config
+                config,
+                disableEdit:config!==undefined
             });
         },
         removeCard(item){
@@ -249,6 +287,14 @@ export default {
         cardConfigUpdated(item,config){
             this.$set(item,'config',config);
             this.save();
+        },
+        save(layout){
+            if(this.data.activeDashboard){
+                this.layoutJsonStringify = JSON.stringify(layout||this.layout);
+                this.data.activeDashboard.config = this.layoutJsonStringify;
+                this.$http.postJSON("/api/dashboard/update",this.data.activeDashboard)
+                    .then(()=>{})
+            }
         },
         dashboardMove(i,direction){
             let target = this.modalDashboard.refs.splice(i,1);
@@ -301,5 +347,8 @@ export default {
 <style scoped lang="less">
     ::v-deep.nk-page-layout .nk-page-layout-content > .content{
         padding: 15px !important;
+    }
+    .simple-item + .simple-item{
+        margin-top: 15px;
     }
 </style>
