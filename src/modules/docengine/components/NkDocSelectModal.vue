@@ -160,7 +160,7 @@ export default {
     },
     methods:{
         query(){
-            const aggs = this.modal.searchItems.filter(i=>i.agg).map(i=>i.field);
+            const aggs = this.modal.searchItems && this.modal.searchItems.filter(i=>i.agg).map(i=>i.field);
             const postCondition = this.modal.postCondition;
             const url = `/api/doc/list/${this.modal.index||'document'}`;
 
