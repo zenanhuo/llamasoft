@@ -83,6 +83,9 @@ export default {
       nkPercent ({ cellValue }) {
         return NkFormat.nkPercent(cellValue)
       },
+      nkNumber ({ cellValue },format) {
+        return NkFormat.nkNumber(cellValue,format)
+      },
       nkNull({cellValue},defaultValue){
         return cellValue || defaultValue;
       },
