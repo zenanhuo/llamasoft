@@ -82,6 +82,7 @@
                                :key="item.path"
                                :is="item.component"
                                ref="pages"
+                               @message="tabMessage(item,$event)"
                                @close="tabPanelClose(item)"
                                @replace="tabReplace(item,$event)"
                                @setTab="tabUpdate(item,$event)"
@@ -377,6 +378,13 @@ export default {
                     }
                 }
             }
+        },
+        tabMessage(item,e){
+              this.$refs.pages.forEach(i=>{
+                  if(i!==item && i.nk$message){
+                      i.nk$message(e);
+                  }
+              });
         },
         tabSort(items){
             this.pages = items;

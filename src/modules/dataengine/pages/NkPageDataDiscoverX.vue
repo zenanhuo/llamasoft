@@ -67,6 +67,9 @@
                                         sorted:[],
                                         chart:undefined
                                     }">清空并退出高级模式</a>
+                                <a v-if="gridData && !queryBuilder.chart" @click="setupChart" style="margin-left: 10px;">数据透视</a>
+                                <a v-if="gridData &&  queryBuilder.chart" @click="queryBuilder.chart=undefined" style="margin-left: 10px;">移除数据透视</a>
+                                <a v-if="gridData &&  queryBuilder.chart" @click="addDashboard" style="margin-left: 10px;">添加到Dashboard</a>
                             </nk-form-item>
                             <nk-form-item>
                                 <a-button class="selected-item" type="primary" @click="runSql"><a-icon type="play-circle" /></a-button>
@@ -74,7 +77,7 @@
                             </nk-form-item>
                         </template>
                         <template v-else>
-                            <nk-form-item title="数据集">
+                            <nk-form-item title="数据集" style="align-items: center">
                                 <a-select v-model="queryBuilder.index" class="selected-item" style="width: 200px;" @change="indexChange($event)" :dropdownMatchSelectWidth="false">
                                     <a-select-option v-for="item in dataSources" :key="item.name">
                                         <a-icon :component="icon['Icon'+item.type]" />
@@ -87,7 +90,7 @@
                                 </a-button-group>
                                 <a-button class="selected-item" type="default" @click="saveAs.visible=true" :disabled="!(queryBuilder.index && queryBuilder.fields.length)"><a-icon type="save" />...</a-button>
                             </nk-form-item>
-                            <nk-form-item title="维度" v-if="hasGroupOrAgg || groupFields.length">
+                            <nk-form-item title="维度" v-if="hasGroupOrAgg || groupFields.length" style="align-items: center">
                                 <span class="selected-item empty" v-if="!groupFields.length"></span>
                                 <a-button-group class="selected-item value" v-for="(item,index) in groupFields" :key="index">
                                     <a-button @click="editField(item)" :type="item._error?'danger':'default'">
@@ -105,7 +108,7 @@
                                     <a-select-option v-for="field in availableFields" :key="field.name">{{field.desc||field.name}}</a-select-option>
                                 </a-select>
                             </nk-form-item>
-                            <nk-form-item title="指标" v-if="hasGroupOrAgg || aggFields.length">
+                            <nk-form-item title="指标" v-if="hasGroupOrAgg || aggFields.length" style="align-items: center">
                                 <span class="selected-item empty" v-if="!aggFields.length"></span>
                                 <a-button-group class="selected-item value" v-for="(item,index) in aggFields" :key="index">
                                     <a-button @click="editField(item)" :type="item._error?'danger':'default'">
@@ -123,7 +126,7 @@
                                     <a-select-option v-for="field in availableFields" :key="field.name">{{field.desc||field.name}}</a-select-option>
                                 </a-select>
                             </nk-form-item>
-                            <nk-form-item title="字段" v-if="!hasGroupOrAgg || simpleFields.length">
+                            <nk-form-item title="字段" v-if="!hasGroupOrAgg || simpleFields.length" style="align-items: center">
                                 <span class="selected-item empty" v-if="!simpleFields.length"></span>
                                 <a-button-group class="selected-item value" v-for="(item,index) in simpleFields" :key="index">
                                     <a-button @click="editField(item)" :type="item._error?'danger':'default'">
@@ -141,7 +144,7 @@
                                     <a-select-option v-for="field in availableFields" :key="field.name">{{field.desc||field.name}}</a-select-option>
                                 </a-select>
                             </nk-form-item>
-                            <nk-form-item title="条件过滤">
+                            <nk-form-item title="条件过滤" style="align-items: center">
 
                                 <span class="selected-item empty" v-if="!queryBuilder.filter.length && !havingFields.length"></span>
 
@@ -170,7 +173,7 @@
                                     <a-select-option v-for="field in availableFields" :key="field.name">{{field.desc||field.name}}</a-select-option>
                                 </a-select>
                             </nk-form-item>
-                            <nk-form-item title="排序">
+                            <nk-form-item title="排序" style="align-items: center">
 
                                 <span class="selected-item empty" v-if="!queryBuilder.sorted.length"></span>
                                 <a-button-group class="selected-item value" v-for="(item,index) in sortedFields" :key="index">
@@ -193,6 +196,7 @@
                                 <a @click="custom">切换到高级模式</a>
                                 <a v-if="gridData && !queryBuilder.chart" @click="setupChart" style="margin-left: 10px;">数据透视</a>
                                 <a v-if="gridData &&  queryBuilder.chart" @click="queryBuilder.chart=undefined" style="margin-left: 10px;">移除数据透视</a>
+                                <a v-if="gridData &&  queryBuilder.chart" @click="addDashboard" style="margin-left: 10px;">添加到Dashboard</a>
                             </nk-form-item>
                         </template>
                     </nk-form>
@@ -201,6 +205,7 @@
                                :is="queryBuilder.chart.component"
                                v-model="queryBuilder.chart"
                                :editable="true"
+                               :enable-setting="true"
                                :default-data="gridData"
                                :column-defs="gridColumns"
                                style="height: 300px;">
@@ -249,6 +254,10 @@
 
         <a-modal v-model="saveAs.visible" centered title="请输入备注" @ok="saveAsPost" :confirm-loading="saveAs.confirmLoading">
             <a-input v-model="saveAs.name" placeholder="请输入搜索备注，便于后期使用"></a-input>
+        </a-modal>
+
+        <a-modal v-model="addCard.visible" centered title="请输入卡片名称" @ok="doAddDashboard" :confirm-loading="addCard.confirmLoading">
+            <a-input v-model="addCard.title" placeholder="请输入卡片名称"></a-input>
         </a-modal>
 
         <a-modal v-model="modalAvailableCards.visible" title="请选择图表模版">
@@ -352,6 +361,11 @@ export default {
                 confirmLoading: false,
                 list: []
             },
+            addCard:{
+                visible: false,
+                title: undefined,
+                confirmLoading: false,
+            }
         }
     },
     computed:{
@@ -591,31 +605,35 @@ export default {
             this.data = {};
             setTimeout(()=>{
                 this.queryBuilder = Object.assign({},JSON.parse(item.json||'{}'));
-                this.runSql();
-                this.indexChange(this.queryBuilder.index,true);
+                this.indexChange(this.queryBuilder.index,true).then(this.runSql);
             },100);
         },
         indexChange(index,keep){
-            this.$http.post(`/api/data/analyse/fieldCaps/${index}`)
-                .then(res=>{
-                    if(!keep){
-                        this.queryBuilder = {
-                            custom:false,
-                            index,
-                            fields:[],
-                            filter:[],
-                            sorted:[],
-                            chart:undefined
+            return new Promise((resolve)=>{
+
+                this.$http.post(`/api/data/analyse/fieldCaps/${index}`)
+                    .then(res=>{
+                        if(!keep){
+                            this.queryBuilder = {
+                                custom:false,
+                                index,
+                                fields:[],
+                                filter:[],
+                                sorted:[],
+                                chart:undefined
+                            }
                         }
-                    }
-                    this.dataFields = res.data.sort((a,b)=>a.name > b.name ?1:-1);
-                    this.filterListedField = undefined;
+                        this.dataFields = res.data.sort((a,b)=>a.name > b.name ?1:-1);
+                        this.filterListedField = undefined;
 
-                    const datasource = this.dataSources.find(i=>i.name===index);
-                    this.dialect = dataSourceDialects[datasource.type];
+                        const datasource = this.dataSources.find(i=>i.name===index);
+                        this.dialect = dataSourceDialects[datasource.type];
 
-                    this.$http.get(`/api/platform/registry/value/json/@DATASET/${index}`).then(res=>this.dataFieldsDesc = res.data);
-                });
+                        this.$http.get(`/api/platform/registry/value/json/@DATASET/${index}`).then(res=>this.dataFieldsDesc = res.data);
+
+                        resolve();
+                    });
+            })
         },
         addField(name){
             const item = Object.assign({},this.availableFields.find(i=>i.name === name));
@@ -713,8 +731,19 @@ export default {
                 });
             //this.$set(this.queryBuilder,'chart',{});
         },
+        addDashboard(){
+            this.addCard.visible = true;
+        },
+        doAddDashboard(){
+            this.$emit('message',{
+                'type':'addCard',
+                config: Object.assign({},this.queryBuilder.chart,{sql: this.sql,title: this.addCard.title})
+            });
+            this.addCard.visible = false;
+            this.addCard.title = undefined;
+        },
         selectChart(e){
-            this.$set(this.queryBuilder,'chart',{component:e.component,title:e.name});
+            this.$set(this.queryBuilder,'chart',{component:e.component,title:e.name,w:e.w,h:e.h});
             this.modalAvailableCards.visible=false;
         }
     },

@@ -88,7 +88,7 @@ const keyword = {
         e.$format = {
             alias,
             select:`${e.aggregation ? (e.aggregation+'('+e.name+')') : e.name} AS "${alias}"`,
-            group: e.group  && `"${alias}"`,
+            group: e.group  && `${e.name}`,
             having:e.having && `"${alias}" ${e.having} ${value}`
         };
     }

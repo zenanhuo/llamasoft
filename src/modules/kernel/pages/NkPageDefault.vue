@@ -65,6 +65,7 @@
                                :title="item.title"
                                :value="item.config"
                                :editable="editable"
+                               :enableSetting="!item.disableEdit"
                                ref="items"
                                @remove="removeCard(item)"
                                @update:config="cardConfigUpdated(item,$event)"
@@ -194,6 +195,9 @@ export default {
     },
     methods:{
         nk$show(){
+            if(this.reload){
+                this.load(this.data.activeDashboard.id)
+            }
             window.dispatchEvent(new Event('resize'));
         },
         load(id){
@@ -210,17 +214,11 @@ export default {
                         this.layout=[];
                         this.addCard(8,5,"nk-dashboard-hello","欢迎使用");
                     }
+                    console.log(this.layout)
                     this.editable = this.data.activeDashboard.accountId === this.user.id;
                     this.loading = false;
+                    this.reload = false;
                 });
-        },
-        save(){
-            if(this.data.activeDashboard){
-                this.layoutJsonStringify = JSON.stringify(this.layout);
-                this.data.activeDashboard.config = this.layoutJsonStringify;
-                this.$http.postJSON("/api/dashboard/update",this.data.activeDashboard)
-                    .then(()=>{})
-            }
         },
         menuClick(e){
             if(e.key==="1"){
@@ -245,6 +243,28 @@ export default {
                 //this.addCard(8,5,"nk-dashboard-bar1","客户统计123");
             }
         },
+        nk$message(e){
+            if(e.type==='addCard'){
+                const config = e.config;
+
+                let x = 0;
+                let y = Math.max(Math.max.apply(null,this.layout.map(i=>i.y+i.h))+1,0);
+
+                const layout = new Array(...this.layout)
+                layout.push({
+                    "i":uuidv4(),
+                    x,
+                    y,
+                    w:config.w,
+                    h:config.h,
+                    component:config.component,
+                    title:config.title,
+                    config
+                });
+                this.save(layout);
+                this.reload = true;
+            }
+        },
         addCard(w,h,component,title,config){
             let x = 0;
             let y = Math.max(Math.max.apply(null,this.layout.map(i=>i.y+i.h))+1,0);
@@ -257,7 +277,8 @@ export default {
                 h,
                 component,
                 title,
-                config
+                config,
+                disableEdit:config!==undefined
             });
         },
         removeCard(item){
@@ -266,6 +287,14 @@ export default {
         cardConfigUpdated(item,config){
             this.$set(item,'config',config);
             this.save();
+        },
+        save(layout){
+            if(this.data.activeDashboard){
+                this.layoutJsonStringify = JSON.stringify(layout||this.layout);
+                this.data.activeDashboard.config = this.layoutJsonStringify;
+                this.$http.postJSON("/api/dashboard/update",this.data.activeDashboard)
+                    .then(()=>{})
+            }
         },
         dashboardMove(i,direction){
             let target = this.modalDashboard.refs.splice(i,1);
