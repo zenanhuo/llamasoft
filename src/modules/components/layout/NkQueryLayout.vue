@@ -76,23 +76,33 @@
                             隐藏条件[{{ routeQuery.length }}]
                         </label>
                         <a-button-group class="nk-button">
-                            <a-button type="primary" html-type="submit" style="width: 46px;">
-                                <a-icon type="search" />
-                            </a-button>
-                            <a-button v-if="exportConfig && exportConfig.enable" type="default" @click="doExport" style="width: 46px;" :loading="exportLoading">
-                                <a-icon type="export" v-if="!exportLoading" />
-                            </a-button>
-                            <a-button type="default" @click="reset({})" style="width: 46px;">
-                                <a-icon type="rollback" />
-                            </a-button>
+                            <a-tooltip title="查询">
+                                <a-button type="primary" html-type="submit" style="width: 46px;">
+                                    <a-icon type="search" />
+                                </a-button>
+                            </a-tooltip>
+                            <a-tooltip title="导出">
+                                <a-button v-if="exportConfig && exportConfig.enable" type="default" @click="doExport" style="width: 46px;" :loading="exportLoading">
+                                    <a-icon type="export" v-if="!exportLoading" />
+                                </a-button>
+                            </a-tooltip>
+                            <a-tooltip title="清空条件">
+                                <a-button type="default" @click="reset({})" style="width: 46px;">
+                                    <a-icon type="rollback" />
+                                </a-button>
+                            </a-tooltip>
                         </a-button-group>
                         <a-button-group class="nk-button">
-                            <a-button type="default" @click="$refs.grid.print()">
-                                <a-icon type="printer" />
-                            </a-button>
-                            <a-button v-if="saveAsSource" type="default" @click="saveAs.visible=true" style="width: 56px;">
-                                <a-icon type="save" />...
-                            </a-button>
+                            <a-tooltip title="打印">
+                                <a-button type="default" @click="$refs.grid.print()">
+                                    <a-icon type="printer" />
+                                </a-button>
+                            </a-tooltip>
+                            <a-tooltip title="保存当前过滤条件">
+                                <a-button v-if="saveAsSource" type="default" @click="saveAs.visible=true" style="width: 56px;">
+                                    <a-icon type="save" />...
+                                </a-button>
+                            </a-tooltip>
                         </a-button-group>
                     </nk-search-item>
                 </nk-search-box>
