@@ -66,7 +66,7 @@
             <vxe-table-column   title=""            field=""               >
                 <template v-slot:default="{seq,row}">
                     <span v-if="editMode" class="drag-btn" style="margin-right: 10px;">
-                            <a-icon type="swap" rotate="90" />
+                            <a-icon type="swap" :rotate="90" />
                         </span>
                     <span v-if="editMode" style="margin-right: 10px;" @click="$nkSortableRemove(docDef.cards,seq)">
                             <a-icon type="delete" />

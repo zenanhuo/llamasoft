@@ -51,7 +51,7 @@
 
             <vxe-table-column>
                 <template v-slot="{ seq }">
-                    <span v-if="editMode" class="drag-btn" style="margin-right: 10px;"><a-icon type="swap" rotate="90" /></span>
+                    <span v-if="editMode" class="drag-btn" style="margin-right: 10px;"><a-icon type="swap" :rotate="90" /></span>
                     <span v-if="editMode" @click="$nkSortableRemove(docDef.flows,seq)"><a-icon type="delete" /></span>
                 </template>
             </vxe-table-column>

@@ -72,7 +72,7 @@
             <vxe-column title="" fixed="right" width="60px">
                 <template v-slot="{seq,items}">
                     <span v-if="editMode && def.sortable" class="drag-btn btn">
-                        <a-icon type="swap" rotate="90" />
+                        <a-icon type="swap" :rotate="90" />
                     </span>
                     <span v-if="editMode&&!def.disabledRemove" class="btn" @click="xTableRemove(data,seq)">
                         <a-icon type="delete" />

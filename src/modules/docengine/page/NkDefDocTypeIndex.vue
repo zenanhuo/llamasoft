@@ -46,6 +46,7 @@
                     {value:'float',   label:  'float | 浮点型'},
                     {value:'double',  label: 'double | 双精度浮点型'},
                     {value:'date',    label:   'date | 日期（秒）'},
+                    {value:'completion', label:'completion | 搜索建议'},
                     {value:'text$',   label:  'text$ | 分词文本(全文检索)'},
                     {value:'name$',   label:  'name$ | 名称文本(全文检索)'},
                     {value:'serial$', label:'serial$ | 序列号文本(全文检索)'},
