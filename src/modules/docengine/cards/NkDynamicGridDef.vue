@@ -87,7 +87,7 @@
                               field="">
                 <template v-slot="{seq,items}">
                     <span v-if="editMode && sortable" class="drag-btn" style="margin-left: 10px;">
-                        <a-icon type="swap" rotate="90" />
+                        <a-icon type="swap" :rotate="90" />
                     </span>
                     <span v-if="editMode" style="margin-left: 10px;" @click="$nkSortableRemove(def.items,seq)">
                         <a-icon type="delete" />

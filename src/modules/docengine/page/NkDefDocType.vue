@@ -89,7 +89,7 @@
                         </a>
                         <a @click="openDefTree">Graph</a>
                     </div>
-                    <div slot="footer" style="text-align: center;color: #999;cursor: pointer;">
+                    <div slot="footer" style="text-align: center;color: #999;cursor: pointer;" @click="menuClick(historiesListMenu)">
                         查看全部
                     </div>
                     <a-list-item slot="renderItem"

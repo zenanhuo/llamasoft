@@ -40,13 +40,13 @@ export default {
     },
     computed:{
         suggestList(){
-            const field = (this.config.field[0]||this.config.field).split('.');
-            return this.suggest && this.suggest.map(i=>{
+            const field = (this.config.field instanceof Array ? this.config.field[0] : this.config.field).split('.');
+            return (this.suggest && this.suggest.map(i=>{
                 field.forEach(f=>{
                     i=i[f]
                 })
                 return i;
-            });
+            }).filter(i=>i!==undefined))||[];
         }
     },
     methods:{
@@ -74,7 +74,7 @@ export default {
         search(e){
             if(e&&e.trim()){
                 this.$emit("suggest",{
-                    field: this.config.field[0]||this.config.field,
+                    field: this.config.field instanceof Array ? this.config.field[0] : this.config.field,
                     text: e
                 });
             }

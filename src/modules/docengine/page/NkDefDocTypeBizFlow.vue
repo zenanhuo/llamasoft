@@ -32,7 +32,7 @@
             :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, activeMethod: ()=>{return editMode}}"
             :data="docDef.flows">
             <vxe-table-column field="preDocType"    width="15%" :edit-render="{name: '$input',props: {type: 'text',maxlength:4}}" title="前置模型"/>
-            <vxe-table-column field="preDocState"   width="15%" :edit-render="{name: '$input',props: {type: 'text',maxlength:4}}" title="前置模型状态" />
+            <vxe-table-column field="preDocState"   width="15%" :edit-render="{name: '$input',props: {type: 'text'}}" title="前置模型状态" />
             <vxe-table-column field="refObjectType" width="20%" :edit-render="{name:'$select',options: docOptions.docFlowInterceptors,optionProps: {value: 'key', label: 'name'},}" title="扩展程序" >
                 <template v-slot="{ row }">
                     <nk-script-label :value="row.refObjectType"></nk-script-label>
@@ -49,9 +49,14 @@
                 </template>
             </vxe-table-column>
 
+            <vxe-table-column   title="不显示"   field="displayButton" width="10%" :formatter="({cellValue})=>cellValue?'是':''" :edit-render="{
+                name: '$switch',
+                props: {'open-value':1,'close-value':0},
+            }"/>
+
             <vxe-table-column>
                 <template v-slot="{ seq }">
-                    <span v-if="editMode" class="drag-btn" style="margin-right: 10px;"><a-icon type="swap" rotate="90" /></span>
+                    <span v-if="editMode" class="drag-btn" style="margin-right: 10px;"><a-icon type="swap" :rotate="90" /></span>
                     <span v-if="editMode" @click="$nkSortableRemove(docDef.flows,seq)"><a-icon type="delete" /></span>
                 </template>
             </vxe-table-column>

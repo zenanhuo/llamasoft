@@ -67,10 +67,12 @@
                 </template>
             </vxe-column>
             <!--增加一行空列，避免宽度不够不能自适应-->
+            <vxe-column>
+            </vxe-column>
             <vxe-column title="" fixed="right" width="60px">
                 <template v-slot="{seq,items}">
                     <span v-if="editMode && def.sortable" class="drag-btn btn">
-                        <a-icon type="swap" rotate="90" />
+                        <a-icon type="swap" :rotate="90" />
                     </span>
                     <span v-if="editMode&&!def.disabledRemove" class="btn" @click="xTableRemove(data,seq)">
                         <a-icon type="delete" />

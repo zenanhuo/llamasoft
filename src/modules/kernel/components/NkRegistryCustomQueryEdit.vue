@@ -89,7 +89,7 @@
                     <vxe-table-column>
                         <template v-slot="{seq,row}">
                             <span class="drag-btn" style="margin-right: 10px;">
-                                <a-icon type="swap" rotate="90" />
+                                <a-icon type="swap" :rotate="90" />
                             </span>
                             <span style="margin-right: 10px;" @click="$nkSortableRemove(json.searchItemsDefault,seq)">
                                 <a-icon type="delete" />
@@ -148,7 +148,7 @@
                     <vxe-table-column>
                         <template v-slot="{seq,row}">
                             <span class="drag-btn" style="margin-right: 10px;">
-                                <a-icon type="swap" rotate="90" />
+                                <a-icon type="swap" :rotate="90" />
                             </span>
                             <span style="margin-right: 10px;" @click="$nkSortableRemove(json.searchItemsMoreDef,seq)">
                                 <a-icon type="delete" />
@@ -210,7 +210,7 @@
                     <vxe-table-column>
                         <template v-slot="{seq,row}">
                             <span class="drag-btn" style="margin-right: 10px;">
-                                <a-icon type="swap" rotate="90" />
+                                <a-icon type="swap" :rotate="90" />
                             </span>
                             <span style="margin-right: 10px;" @click="$nkSortableRemove(json.columns,seq)">
                                 <a-icon type="delete" />

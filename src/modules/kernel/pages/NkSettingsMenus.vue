@@ -94,7 +94,6 @@ export default {
                     options: [
                         [
                             { code: 'add', name: '增加子菜单', prefixIcon: 'fa fa-copy', visible: true, disabled: false },
-                            { code: 'edit',name: '编辑扩展', visible: true, disabled: false },
                             { code: 'del', name: '移除',    visible: true, disabled: false }
                         ]
                     ]
@@ -109,11 +108,12 @@ export default {
                 { title: '菜单',  field: 'title',             width:"15%", editRender:{name:'$input'},treeNode: true },
                 { title: '徽标',  field: 'badgeOption',       width:"15%", editRender:{name:'$input'} },
                 { title: '图标',  field: 'icon',              width:"20%", editRender:{name:'$input'} },
-                { title: '路径',  field: 'url',               width:"25%", editRender:{name:'$input'} },
-                { title: '权限',  field: 'authorityOptions',  width:"20%", editRender:{name:'$input'} },
-                { title: '#',                                width:"5%",
+                { title: '路径',  field: 'url',               width:"22%", editRender:{name:'$input'} },
+                { title: '权限',  field: 'authorityOptions',  width:"18%", editRender:{name:'$input'} },
+                { title: '#',                                width:"10%",
                     slots:{
                         default: (e, h) => {
+                            const self = this;
                             return [
                                 h(  'span',
                                     {
@@ -121,43 +121,31 @@ export default {
                                         style:{"margin-right":"10px"}
                                     },
                                     [
-                                        h('i',{class:{'vxe-icon--menu':true}})
+                                        h('a-icon',{props:{type:'swap',rotate:90}})
                                     ]
                                 ),
-                                // h('a',
-                                //     {
-                                //         style:{"color":"#606266"},
-                                //         on: {
-                                //             click: ()=>{this.showModal(row);}
-                                //         }
-                                //     },
-                                //     [h('i',{class:{'vxe-icon--edit-outline':true}})]
-                                // ),
+                                h(  'span',
+                                    {
+                                        class:{"drag-btn":true},
+                                        style:{"margin-right":"10px"}
+                                    },
+                                    [
+                                        h('a-icon',{
+                                            props:{type:'delete'},
+                                            on:{
+                                                click(){
+                                                    self.xTableDelRow(e.row);
+                                                }
+                                            }
+                                        })
+                                    ]
+                                ),
                             ]
                         }
                     }
                 },
             ],
             xValidRules:{
-                // menuId: [
-                //     { required: true, message: 'KEY必须填写' },
-                //     { validator({$table,row}){
-                //         let error = undefined;
-                //         $table.data.forEach(menu=>{
-                //             if(menu!==row && menu.menuId === row.menuId){
-                //                 error = new Error('KEY 重复');
-                //             }
-                //             if(menu.children){
-                //                 menu.children.forEach(menu=> {
-                //                     if (menu !== row && menu.menuId === row.menuId) {
-                //                         error = new Error('KEY 重复');
-                //                     }
-                //                 });
-                //             }
-                //         });
-                //         return error;
-                //     }}
-                // ],
                 title: [
                     { required: true, message: '标题必须填写' }
                 ],
@@ -240,7 +228,6 @@ export default {
         xMenuClick({menu,row}){
             switch (menu.code) {
                 case 'add': this.xTableAddRow(row);break;
-                case 'edit':this.showModal(row);break;
                 case 'del': this.xTableDelRow(row);break;
                 default:    this.$XModal.message({ message: `点击了 "${menu.name}"`, status: 'info' })
             }
@@ -275,36 +262,6 @@ export default {
                 })
             }
         },
-        // showModal(menu){
-        //     this.menuHasError = undefined;
-        //     this.menu = menu;
-        //     if(this.menu.menuOptionsLoad){
-        //         this.menuOptions = this.menu.menuOptions;
-        //         this.modalVisible = true;
-        //     }else{
-        //         this.spinning = true;
-        //         this.$http.get(`/api/webapp/menu/${menu.menuId}`).then(res=>{
-        //             this.menu.menuOptionsLoad=true;
-        //             this.menu.menuOptions=res.data.menuOptions;
-        //             this.menuOptions = this.menu.menuOptions;
-        //             this.modalVisible = true;
-        //             this.spinning = false;
-        //         });
-        //     }
-        // },
-        // modalSubmit(){
-        //     if(!this.menuOptions.startsWith('{')){
-        //         this.menuHasError = 'JSON 格式不合法';
-        //         return;
-        //     }
-        //     try{
-        //         NkUtil.parseJSON(this.menuOptions);
-        //         this.menu.menuOptions=this.menuOptions;
-        //         this.modalVisible = false;
-        //     }catch (e){
-        //         this.menuHasError = e.message;
-        //     }
-        // },
         submit(){
             this.$refs.xTable.validate(true).then((res)=>{
                 if(res){

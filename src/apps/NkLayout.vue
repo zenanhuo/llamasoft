@@ -59,6 +59,7 @@
                                 <a-menu-item key="2">
                                     <a @click="logout()">安全退出</a>
                                 </a-menu-item>
+                                <a-menu-divider />
                                 <a-menu-item key="4">
                                     <router-link to="/apps/about">关于ELCube</router-link>
                                 </a-menu-item>
@@ -82,6 +83,7 @@
                                :key="item.path"
                                :is="item.component"
                                ref="pages"
+                               @message="tabMessage(item,$event)"
                                @close="tabPanelClose(item)"
                                @replace="tabReplace(item,$event)"
                                @setTab="tabUpdate(item,$event)"
@@ -377,6 +379,13 @@ export default {
                     }
                 }
             }
+        },
+        tabMessage(item,e){
+              this.$refs.pages.forEach(i=>{
+                  if(i!==item && i.nk$message){
+                      i.nk$message(e);
+                  }
+              });
         },
         tabSort(items){
             this.pages = items;
