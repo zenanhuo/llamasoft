@@ -49,6 +49,11 @@
                 </template>
             </vxe-table-column>
 
+            <vxe-table-column   title="不显示"   field="displayButton" width="10%" :formatter="({cellValue})=>cellValue?'是':''" :edit-render="{
+                name: '$switch',
+                props: {'open-value':1,'close-value':0},
+            }"/>
+
             <vxe-table-column>
                 <template v-slot="{ seq }">
                     <span v-if="editMode" class="drag-btn" style="margin-right: 10px;"><a-icon type="swap" :rotate="90" /></span>
