@@ -59,6 +59,7 @@
                                 <a-menu-item key="2">
                                     <a @click="logout()">安全退出</a>
                                 </a-menu-item>
+                                <a-menu-divider />
                                 <a-menu-item key="4">
                                     <router-link to="/apps/about">关于ELCube</router-link>
                                 </a-menu-item>
